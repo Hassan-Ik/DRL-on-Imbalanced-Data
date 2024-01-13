@@ -121,6 +121,8 @@ class Agent:
             labels = [val_label]
             predictions = [val_prediction]
         for idx, (label, prediction) in enumerate(zip(labels, predictions)):
+            accuracy_score = metrics.accuracy_score(label, prediction)
+            print("Accuracy Score: ", accuracy_score)
             f1_all_cls = metrics.f1_score(label, prediction, average=None)
             f1_macro_avg = metrics.f1_score(label, prediction, average='weighted')
             print("\t\t {:<20} f1-score of ".format(phase[idx]), end="")
