@@ -1,6 +1,8 @@
 import tensorflow as tf
 import numpy as np
-
+import pandas as pd
+from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
 
 class Dataset:
     def __init__(self, config):
@@ -108,10 +110,10 @@ class CassavaLeafDataset:
         return img, label
     
     def create_dataset(self):
-        X_train, X_test, y_train, y_test = train_test_split(self.X, self.y, random_state=42, test_size=0.2)
+        x_train, x_test, y_train, y_test = train_test_split(self.X, self.y, random_state=42, test_size=0.2)
         
-        training_data = tf.data.Dataset.from_tensor_slices((X_train.filepath.values, y_train))
-        testing_data = tf.data.Dataset.from_tensor_slices((X_test.filepath.values, y_test))
+        training_data = tf.data.Dataset.from_tensor_slices((x_train.filepath.values, y_train))
+        testing_data = tf.data.Dataset.from_tensor_slices((x_test.filepath.values, y_test))
 
         AUTOTUNE = tf.data.experimental.AUTOTUNE
 
@@ -199,7 +201,7 @@ class PersonalityDataset:
         self.get_minority_classes()
 
     def create_dataset(self):
-        df = pd.read_csv("../16P/16P.csv", encoding='cp1252')
+        df = pd.read_csv("./16P/16P.csv", encoding='cp1252')
         
         df = df.dropna()
 
@@ -209,20 +211,19 @@ class PersonalityDataset:
         self.label_encoder = LabelEncoder()
         self.y = self.label_encoder.fit_transform(self.y)
         
-        self.y = tf.keras.utils.to_categorical(self.y)
+        # self.y = tf.keras.utils.to_categorical(self.y)
 
-        self.unique_labels, self.label_counts = np.unique((np.argmax(self.y, axis=1)), return_counts=True)
+        self.unique_labels, self.label_counts = np.unique(self.y, return_counts=True)
         
-        X_train, X_test, y_train, y_test = train_test_split(self.X.values, self.y, random_state=42, test_size=0.2)
+        x_train, x_test, y_train, y_test = train_test_split(self.X.values, self.y, random_state=42, test_size=0.2)
         
         # We are going to get 25% minority classes from total classes i-e if there are total 6 classes then we will only set 2 classes as minority classes
-        self.no_of_minority_classes_to_get = int(np.round(len(np.unique(np.argmax(y_train, axis=1))) * 0.25))
+        self.no_of_minority_classes_to_get = int(np.round(len(np.unique(y_train)) * 0.25))
         
         # Specify the percentage of label 2 data to remove
         percentage_to_remove = 90
         for class_to_remove in range(self.no_of_minority_classes_to_get):
-            argmax_values = np.argmax(y_train, axis=1)
-            indices_to_remove = np.unique(np.where(argmax_values == class_to_remove)[0])
+            indices_to_remove = np.unique(np.where(y_train == class_to_remove)[0])
             # Calculate the number of samples to remove
             num_samples_to_remove = int(percentage_to_remove / 100 * len(indices_to_remove))
 
@@ -232,25 +233,25 @@ class PersonalityDataset:
             percentage_to_remove -= 10
 
             # Remove the selected samples
-            X_train = np.delete(X_train, indices_to_remove, axis=0)
+            x_train = np.delete(x_train, indices_to_remove, axis=0)
             y_train = np.delete(y_train, indices_to_remove, axis=0)
             percentage_to_remove -= 10
 
-        self.X_train = X_train
-        self.X_test = X_test
-        self.y_train = y_train
-        self.y_test = y_test
+        self.x_train = x_train
+        self.x_test = x_test
+        self.y_train = [[y_val] for y_val in y_train]
+        self.y_test = [[y_val] for y_val in y_test]
 
-        self.length_of_dataset = len(X_train)
+        self.length_of_dataset = len(x_train)
         
     def get_labels_counts(self):
-        self.unique_labels, self.label_counts = np.unique(np.argmax(self.y_train, axis=1), return_counts=True)
+        self.unique_labels, self.label_counts = np.unique(self.y_train, return_counts=True)
         
         return self.label_counts
         
     def get_minority_classes(self):
         
-        unique_labels, label_counts = np.unique((np.argmax(self.y_train, axis=1)), return_counts=True)
+        unique_labels, label_counts = np.unique(self.y_train, return_counts=True)
         print("Label is ", unique_labels)
         labels_with_counts = {}
 
