@@ -5,9 +5,9 @@ parser = argparse.ArgumentParser()
 
 # Dataset
 parser.add_argument('--dataset_name', type=str, default='cassava', help='Name which dataset to use for DRL classification')
-parser.add_argument('--new_class', type=ast.literal_eval, default='{0:[1], 1:[2], 2:[3], 3: [3], 4:[4]}',
+parser.add_argument('--new_class', type=ast.literal_eval, default='{0:[0], 1:[1], 2:[2], 3: [3], 4:[4]}',
                     help='Change existing class in Cifar10 data to new class')
-parser.add_argument('--minor_classes', type=ast.literal_eval, default=[0, 1],
+parser.add_argument('--minor_classes', type=ast.literal_eval, default=[0, 1, 2],
                     help='Classes to be used as minor classes among the newly changed classes')
 parser.add_argument('--minority_subsample_rate', type=float, default=0.16,
                     help='Imbalance ratio = Ratio of the amount of data in major and minor classes before data subsampling X minority_subsample_rate')

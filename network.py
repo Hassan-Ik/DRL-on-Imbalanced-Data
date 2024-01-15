@@ -56,48 +56,48 @@ class QNetwork:
         return q
     
     def build_simple_network(self):
-        x = tf.compat.v1.layers.dense(self.state, 256, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.dense(self.state, 128, activation=tf.nn.relu)
+        # x = tf.compat.v1.layers.dense(x, 64, activation=tf.nn.relu)
         a = tf.compat.v1.layers.dense(x, self.n_class)
         v = tf.compat.v1.layers.dense(x, 1)
         q = v + a - tf.reduce_mean(a, axis=1, keepdims=True)
         return q
 
-    def efficientnetb0_block(self, inputs, filters, kernel_size, strides, expansion_factor):
-        # Expansion phase
-        x = tf.compat.v1.layers.conv2d(inputs, filters, (1, 1), padding='same', activation=tf.nn.relu)
-        x = tf.compat.v1.layers.batch_normalization(x)
-        
+    def efficientnet_block(self, inputs, filters, kernel_size, strides=(1, 1), expand_ratio=1, se_ratio=None, activation=tf.nn.swish):
+        # Depthwise Convolution
+        x = tf.compat.v1.nn.depthwise_conv2d(inputs, filters, kernel_size, strides=strides, padding='same')
+        x = tf.compat.v1.layers.BatchNormalization(x)
+        x = activation(x)
 
-        # Depthwise convolution
-        x = tf.compat.v1.nn.depthwise_conv2d(x, kernel_size, strides=strides, padding='same')
+        # Project layer
+        input_filters = inputs.get_shape().as_list()[-1]
+        expand_filters = input_filters * expand_ratio
+        x = tf.compat.v1.layers.conv2d(x, expand_filters, (1, 1), padding='same', use_bias=False)
         x = tf.compat.v1.layers.batch_normalization(x)
-        
-        # Pointwise convolution
-        x = tf.compat.v1.layers.conv2d(x, filters, (1, 1), padding='same', activation=tf.nn.relu)
-        x = tf.compat.v1.layers.batch_normalization(x)
+        x = activation(x)
 
-        # Skip connection if the shape is the same (identity)
-        # if tf.shape(inputs)[-1] == filters:
-        #     x = tf.keras.layers.Add()([inputs, x])
-        return x    
+        # Squeeze and Excitation (SE) block
+        if se_ratio:
+            se_filters = max(1, int(input_filters * se_ratio))
+            squeeze = tf.reduce_mean(x, [1, 2], keepdims=True)
+            excitation = tf.compat.v1.layers.conv2d(squeeze, se_filters, (1, 1), activation=tf.nn.swish, use_bias=True)
+            excitation = tf.sigmoid(excitation)
+            x = tf.multiply(x, excitation)
+
+        return x
+    
     def build_complex_network(self):
-        x = tf.compat.v1.layers.conv2d(self.state, 32, kernel_size=(3, 3), strides=(2, 2), padding='same', activation=tf.nn.relu)
-        x = tf.compat.v1.layers.batch_normalization(x)
+        # Entry flow
+        x = tf.compat.v1.layers.conv2d(self.state, filters=32, kernel_size=3, strides=2, padding='same', activation=tf.nn.relu)
         
-        # x = self.efficientnetb0_block(x, 16, (1, 1), (1, 1), 1)
-        # x = self.efficientnetb0_block(x, 24, (3, 3), (2, 2), 6)
-        # x = self.efficientnetb0_block(x, 40, (3, 3), (2, 2), 6)
-        # x = self.efficientnetb0_block(x, 80, (3, 3), (2, 2), 6)
-        x = tf.compat.v1.layers.conv2d(self.state, 16, 5, strides=2, activation=tf.nn.relu)
-        x = tf.compat.v1.layers.conv2d(x, 32, 5, strides=2, activation=tf.nn.relu)
-        x = tf.compat.v1.layers.average_pooling2d(x, (2,2), strides=2)
-
-        x = tf.compat.v1.layers.conv2d(x, 64, 5, strides=1, activation=tf.nn.relu)
-        x = tf.compat.v1.layers.conv2d(x, 128, 5, strides=1, activation=tf.nn.relu)
-        x = tf.compat.v1.layers.average_pooling2d(x, (2,2), strides=2)
+        # Middle flow
+        for _ in range(3):
+            x = tf.compat.v1.layers.conv2d(x, filters=32, kernel_size=3, padding='same', activation=tf.nn.relu)
         
+        # Exit flow
+        x = tf.compat.v1.layers.conv2d(x, filters=64, kernel_size=3, strides=2, padding='same', activation=tf.nn.relu)
         x = tf.compat.v1.layers.flatten(x)
-        x = tf.compat.v1.layers.dense(x, 256, activation=tf.nn.relu)
+
         x = tf.compat.v1.layers.dense(x, 128, activation=tf.nn.relu)
         a = tf.compat.v1.layers.dense(x, self.n_class)
         v = tf.compat.v1.layers.dense(x, 1)

@@ -221,7 +221,7 @@ class PersonalityDataset:
         self.no_of_minority_classes_to_get = int(np.round(len(np.unique(y_train)) * 0.25))
         
         # Specify the percentage of label 2 data to remove
-        percentage_to_remove = 90
+        percentage_to_remove = 80
         for class_to_remove in range(self.no_of_minority_classes_to_get):
             indices_to_remove = np.unique(np.where(y_train == class_to_remove)[0])
             # Calculate the number of samples to remove

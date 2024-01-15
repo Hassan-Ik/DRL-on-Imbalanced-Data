@@ -48,13 +48,13 @@ class Agent:
     def save_model(self, step):
         save_folder = self.config.save_folder
         if save_folder:
-            save_path = os.path.join(save_folder, 'model' + '-step_%d' % step)
+            save_path = os.path.join(save_folder, f'{self.config.dataset_name}-model' + '-step_%d' % step)
             self.saver.save(self.sess, save_path)
 
     def train(self):
         self.sess.run(tf.compat.v1.global_variables_initializer())
         self.sess.run(self.net.update_target, feed_dict={self.net.target_soft_update: 1.})
-        print("start training")
+        print("Start training")
         if self.config.restore_model_path:
             self.saver.restore(self.sess, self.config.restore_model_path)
         eval_s_list = np.array_split(self.dataset.x_test, 10)
