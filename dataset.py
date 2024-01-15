@@ -137,7 +137,7 @@ class CassavaLeafDataset:
                 try:
                     features, labels = sess.run(train_next_element)
                     for i in range(len(labels)):
-                        self.x_train.append(features[i])
+                        self.x_train.append(features[i]/255)
                         self.y_train.append((labels[i],))    
                 except tf.errors.OutOfRangeError:
                     break
@@ -149,12 +149,12 @@ class CassavaLeafDataset:
                 try:
                     features, labels = sess.run(test_next_element)
                     for i in range(len(labels)):
-                        self.x_test.append(features[i])
+                        self.x_test.append(features[i]/255)
                         self.y_test.append((labels[i],))
                         
                 except tf.errors.OutOfRangeError:
                     break
-        return self.training_data_batches, self.testing_data_batches
+        
 
     def get_class_num(self):
         # get number of all classes

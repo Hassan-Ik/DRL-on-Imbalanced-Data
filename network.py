@@ -57,7 +57,6 @@ class QNetwork:
     
     def build_simple_network(self):
         x = tf.compat.v1.layers.dense(self.state, 128, activation=tf.nn.relu)
-        # x = tf.compat.v1.layers.dense(x, 64, activation=tf.nn.relu)
         a = tf.compat.v1.layers.dense(x, self.n_class)
         v = tf.compat.v1.layers.dense(x, 1)
         q = v + a - tf.reduce_mean(a, axis=1, keepdims=True)
@@ -89,16 +88,21 @@ class QNetwork:
     def build_complex_network(self):
         # Entry flow
         x = tf.compat.v1.layers.conv2d(self.state, filters=32, kernel_size=3, strides=2, padding='same', activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=32, kernel_size=3, strides=2, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.batch_normalization(x)
         
-        # Middle flow
-        for _ in range(3):
-            x = tf.compat.v1.layers.conv2d(x, filters=32, kernel_size=3, padding='same', activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=64, kernel_size=3, strides=1, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=128, kernel_size=3, strides=1, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.batch_normalization(x)
         
-        # Exit flow
-        x = tf.compat.v1.layers.conv2d(x, filters=64, kernel_size=3, strides=2, padding='same', activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=64, kernel_size=3, strides=1, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=128, kernel_size=3, strides=1, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.batch_normalization(x)
+        
         x = tf.compat.v1.layers.flatten(x)
-
-        x = tf.compat.v1.layers.dense(x, 128, activation=tf.nn.relu)
+        
+        x = tf.compat.v1.layers.dense(x, 128, activation='relu')
+        x = tf.compat.v1.layers.dense(x, 64, activation='relu')
         a = tf.compat.v1.layers.dense(x, self.n_class)
         v = tf.compat.v1.layers.dense(x, 1)
         q = v + a - tf.reduce_mean(a, axis=1, keepdims=True)

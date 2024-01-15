@@ -12,7 +12,6 @@ if __name__ == '__main__':
         agent = Agent(q_network, dataset, memory, config)
         agent.train()
     elif config.dataset_name == 'personality':
-        config.new_class = "{0:[0], 1:[1], 2:[2], 3:[3], 4:[4], 5:[5], 6:[6], 7:[7], 8:[8], 9:[9], 10:[10], 11:[11], 12:[12], 13:[13], 14:[14], 15:[15]}"
         dataset = PersonalityDataset(batch_size=config.batch)
         q_network = QNetwork(config, 60, 'simple')
         memory = Memory()
