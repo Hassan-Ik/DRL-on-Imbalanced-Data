@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 
-class Dataset:
+class Cifar10Dataset:
     def __init__(self, config):
         self.config = config
         self.n_class = len(self.config.new_class)

@@ -1,5 +1,5 @@
 from DDQNAgent import Agent
-from Datasets import Dataset, CassavaLeafDataset, PersonalityDataset
+from Datasets import Cifar10Dataset, CassavaLeafDataset, PersonalityDataset
 from QNetwork import QNetwork
 from Memory import Memory
 import argparse
@@ -53,7 +53,7 @@ if __name__ == '__main__':
         agent = Agent(q_network, dataset, memory, config)
         agent.train()
     else:
-        dataset = Dataset(config)
+        dataset = Cifar10Dataset(config)
         q_network = QNetwork(config, 32, "")
         memory = Memory()
         agent = Agent(q_network, dataset, memory, config)
