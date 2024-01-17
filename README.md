@@ -7,9 +7,12 @@ To run the Agent training for different datasets try following
 
 ### For Cassava
 
+you will need to downlaod the cassava leaf disease dataset from kaggle using this link (https://www.kaggle.com/competitions/cassava-leaf-disease-classification) and then configure the paths accprding to where you have stored the dataset
+
 `python main.py --dataset_name 'cassava' --new_class '{0:[0], 1:[1], 2:[2], 3:[3], 4:[4]}'`
 
 ### For Personality
+
 
 `python main.py --dataset_name 'personality' --new_class '{0:[0], 1:[1], 2:[2], 3:[3], 4:[4], 5:[5], 6:[6], 7:[7], 8:[8], 9:[9], 10:[10], 11:[11], 12:[12], 13:[13], 14:[14], 15:[15]}'`
 
