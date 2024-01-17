@@ -86,17 +86,17 @@ class QNetwork:
         return x
     
     def build_complex_network(self):
-        # Entry flow
+        
         x = tf.compat.v1.layers.conv2d(self.state, filters=32, kernel_size=3, strides=2, padding='same', activation=tf.nn.relu)
-        x = tf.compat.v1.layers.conv2d(x, filters=32, kernel_size=3, strides=2, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=64, kernel_size=3, strides=2, activation=tf.nn.relu)
         x = tf.compat.v1.layers.batch_normalization(x)
         
-        x = tf.compat.v1.layers.conv2d(x, filters=64, kernel_size=3, strides=1, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=128, kernel_size=3, strides=1, activation=tf.nn.relu)
         x = tf.compat.v1.layers.conv2d(x, filters=128, kernel_size=3, strides=1, activation=tf.nn.relu)
         x = tf.compat.v1.layers.batch_normalization(x)
         
         x = tf.compat.v1.layers.conv2d(x, filters=64, kernel_size=3, strides=1, activation=tf.nn.relu)
-        x = tf.compat.v1.layers.conv2d(x, filters=128, kernel_size=3, strides=1, activation=tf.nn.relu)
+        x = tf.compat.v1.layers.conv2d(x, filters=32, kernel_size=3, strides=1, activation=tf.nn.relu)
         x = tf.compat.v1.layers.batch_normalization(x)
         
         x = tf.compat.v1.layers.flatten(x)

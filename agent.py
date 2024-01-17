@@ -54,7 +54,7 @@ class Agent:
     def train(self):
         self.sess.run(tf.compat.v1.global_variables_initializer())
         self.sess.run(self.net.update_target, feed_dict={self.net.target_soft_update: 1.})
-        print("Start training")
+        print("Starting Training.......")
         if self.config.restore_model_path:
             self.saver.restore(self.sess, self.config.restore_model_path)
         eval_s_list = np.array_split(self.dataset.x_test, 10)

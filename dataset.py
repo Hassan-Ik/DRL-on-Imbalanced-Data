@@ -217,6 +217,7 @@ class PersonalityDataset:
         
         x_train, x_test, y_train, y_test = train_test_split(self.X.values, self.y, random_state=42, test_size=0.2)
         
+        
         # We are going to get 25% minority classes from total classes i-e if there are total 6 classes then we will only set 2 classes as minority classes
         self.no_of_minority_classes_to_get = int(np.round(len(np.unique(y_train)) * 0.25))
         
@@ -250,6 +251,9 @@ class PersonalityDataset:
         return self.label_counts
         
     def get_minority_classes(self):
+        """
+        We are going to get minority label classes from the dataset using this function
+        """
         
         unique_labels, label_counts = np.unique(self.y_train, return_counts=True)
         print("Label is ", unique_labels)
