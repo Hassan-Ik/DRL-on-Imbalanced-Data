@@ -7,6 +7,16 @@ tf.compat.v1.logging.set_verbosity(tf.compat.v1.logging.ERROR)
 
 class Agent:
     def __init__(self, network, dataset, memory, config):
+        """
+        Defining the Agent based on Double Deep Q Network and perorming training/learning tasks and then evaluating the
+        performance of the model learning after certain steps.
+
+        Args:
+            network (QNetwork): Defined Network with its layers.
+            dataset (dataset): Dataset object containing training and validation sets.
+            memory (memory): Memory queue for storing samples.
+            config (config): Configuration file containing parameters for training.
+        """
         self.net = network
         self.dataset = dataset
         self.memory = memory
@@ -61,8 +71,8 @@ class Agent:
         eval_y_list = list(np.squeeze(self.dataset.y_test))
 
         at = np.random.randint(len(self.dataset.x_train))
-        s = self.dataset.x_train[at]  # (32, 32, 3)
-        y = self.dataset.y_train[at]  # (1)
+        s = self.dataset.x_train[at]  # i.e  (32, 32, 3)
+        y = self.dataset.y_train[at]  # i.e (1)
         train_step = 0
         pred_list, label_list = [], []  # for evaluation
         while train_step < self.config.train_step:

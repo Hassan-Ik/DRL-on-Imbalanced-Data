@@ -4,6 +4,14 @@ tf.compat.v1.disable_eager_execution()
 
 class QNetwork:
     def __init__(self, config, size, network_type='simple'):
+        """
+        Defining Deep Q Networks for Reinforcement Learning.
+
+        Args:
+            config (class): Configuration for the network type.
+            size (int): Size of the image
+            network_type (str, optional): What kind of layers network we can depends it usually depends on our dataset and its complexity. Defaults to 'simple'.
+        """
         size = size
         channel = 3
         self.config = config
@@ -63,19 +71,16 @@ class QNetwork:
         return q
 
     def efficientnet_block(self, inputs, filters, kernel_size, strides=(1, 1), expand_ratio=1, se_ratio=None, activation=tf.nn.swish):
-        # Depthwise Convolution
         x = tf.compat.v1.nn.depthwise_conv2d(inputs, filters, kernel_size, strides=strides, padding='same')
         x = tf.compat.v1.layers.BatchNormalization(x)
         x = activation(x)
 
-        # Project layer
         input_filters = inputs.get_shape().as_list()[-1]
         expand_filters = input_filters * expand_ratio
         x = tf.compat.v1.layers.conv2d(x, expand_filters, (1, 1), padding='same', use_bias=False)
         x = tf.compat.v1.layers.batch_normalization(x)
         x = activation(x)
 
-        # Squeeze and Excitation (SE) block
         if se_ratio:
             se_filters = max(1, int(input_filters * se_ratio))
             squeeze = tf.reduce_mean(x, [1, 2], keepdims=True)
